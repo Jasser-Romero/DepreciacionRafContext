@@ -134,5 +134,15 @@ namespace Infraestructure.Repository
             }
 
         }
+
+        public void Update(Activo t)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update(Activo t, int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

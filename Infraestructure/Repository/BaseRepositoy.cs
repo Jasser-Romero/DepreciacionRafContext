@@ -28,5 +28,10 @@ namespace Infraestructure.Repository
         {
             return data;
         }
+
+        public void Update(T t, int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

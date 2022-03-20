@@ -118,5 +118,20 @@ namespace practicaDepreciacion
         {
             dataGridView1.DataSource = activoServices.Read();
         }
+
+        private void btnActualizar_Click(object sender, EventArgs e)
+        {
+            FrmActualizar frmActualizar = new FrmActualizar();
+            frmActualizar.activoServices = activoServices;
+            frmActualizar.lblId.Text = dataGridView1.CurrentRow.Cells[0].Value.ToString();
+            frmActualizar.txtNombre.Text = dataGridView1.CurrentRow.Cells[1].Value.ToString();
+            frmActualizar.nudValor.Value = decimal.Parse(dataGridView1.CurrentRow.Cells[2].Value.ToString());
+            frmActualizar.nudValorResidual.Value = decimal.Parse(dataGridView1.CurrentRow.Cells[3].Value.ToString());
+            frmActualizar.nudVidaUtil.Value = decimal.Parse(dataGridView1.CurrentRow.Cells[4].Value.ToString());
+            
+            frmActualizar.ShowDialog();
+            dataGridView1.DataSource = null;
+            dataGridView1.DataSource = activoServices.Read();
+        }
     }
 }
