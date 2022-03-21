@@ -1,13 +1,6 @@
 ﻿using AppCore.IServices;
 using Domain.Entities;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace practicaDepreciacion
@@ -23,7 +16,7 @@ namespace practicaDepreciacion
 
         private void txtNombre_KeyUp(object sender, KeyEventArgs e)
         {
-           
+
         }
 
         private void txtNombre_KeyPress(object sender, KeyPressEventArgs e)
@@ -35,7 +28,7 @@ namespace practicaDepreciacion
             }
         }
 
-    
+
 
         private void txtValor_KeyPress_1(object sender, KeyPressEventArgs e)
         {
@@ -78,8 +71,8 @@ namespace practicaDepreciacion
                 {
                     Nombre = txtNombre.Text,
                     Valor = double.Parse(txtValor.Text),
-                    ValorResidual=double.Parse(txtValorR.Text),
-                    VidaUtil= int.Parse(txtVidaU.Text)
+                    ValorResidual = double.Parse(txtValorR.Text),
+                    VidaUtil = int.Parse(txtVidaU.Text)
                 };
                 activoServices.Add(activo);
                 dataGridView1.DataSource = null;
@@ -92,7 +85,7 @@ namespace practicaDepreciacion
         {
             if (String.IsNullOrEmpty(txtNombre.Text) || String.IsNullOrEmpty(txtValor.Text) || String.IsNullOrEmpty(txtVidaU.Text) || String.IsNullOrEmpty(txtValorR.Text))
             {
-              
+
                 return false;
             }
             return true;
@@ -128,10 +121,29 @@ namespace practicaDepreciacion
             frmActualizar.nudValor.Value = decimal.Parse(dataGridView1.CurrentRow.Cells[2].Value.ToString());
             frmActualizar.nudValorResidual.Value = decimal.Parse(dataGridView1.CurrentRow.Cells[3].Value.ToString());
             frmActualizar.nudVidaUtil.Value = decimal.Parse(dataGridView1.CurrentRow.Cells[4].Value.ToString());
-            
+
             frmActualizar.ShowDialog();
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = activoServices.Read();
+        }
+
+        private void btnEliminar_Click(object sender, EventArgs e)
+        {
+
+            if (dataGridView1.CurrentRow.Selected == false)
+            {
+                MessageBox.Show("Debe seleccionar un activo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            //activoServices.Delete(dataGridView1.CurrentRow.Index);
+            //dataGridView1.DataSource = null;
+            //dataGridView1.DataSource = activoServices.Read();
+        }
+
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            int ID=(int)dataGridView1.Rows[e.RowIndex].Cells[0].Value;
         }
     }
 }

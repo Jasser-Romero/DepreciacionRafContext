@@ -39,5 +39,10 @@ namespace practicaDepreciacion
             activoServices.Update(activo, activo.Id);
             Dispose();
         }
+
+        private void btnCancelar_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

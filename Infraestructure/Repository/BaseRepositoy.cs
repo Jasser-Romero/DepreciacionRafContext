@@ -24,12 +24,17 @@ namespace Infraestructure.Repository
             data.Remove(t);
         }
 
+        public void Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<T> Read()
         {
             return data;
         }
 
-        public void Update(T t, int id)
+        public void Update(T t,int id)
         {
             throw new NotImplementedException();
         }

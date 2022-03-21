@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infraestructure.Repository
 {
@@ -29,6 +25,11 @@ namespace Infraestructure.Repository
         public Stream DataStream
         {
             get => File.Open($"{fileName}.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+        }
+
+        public Stream TemporaryStream
+        {
+            get => File.Open($"{fileName}.tmp", FileMode.OpenOrCreate, FileAccess.ReadWrite);
         }
 
         public void Create<T>(T t)
@@ -202,7 +203,43 @@ namespace Infraestructure.Repository
 
         public void Delete<T>(int id)
         {
-           
+
+           //TODO: Falta agregar busqueda del id y agregar funciones para eliminar el objeto
+
+            try
+            {
+                int n = 0, k = 0;
+
+                if (id < 0)
+                {
+                    throw new Exception("No exiten objetos activos");
+                }
+
+                using (BinaryReader brHeader = new BinaryReader(HeaderStream))
+                {
+                    if (brHeader.BaseStream.Length > 0)
+                    {
+                        brHeader.BaseStream.Seek(0, SeekOrigin.Begin);
+                        n = brHeader.ReadInt32();
+                    }
+
+                    k = brHeader.ReadInt32();
+                    //verificando si el que se elimina esta en la ultima posicion
+                    k = (k == id) ? k - 1 : k;
+
+                    using (BinaryWriter brtemporay = new BinaryWriter(TemporaryStream))
+                    {
+                        brtemporay.Write(--n);
+                        brtemporay.Write(k);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+
         }
         public T Get<T>(int id)
         {
@@ -213,7 +250,7 @@ namespace Infraestructure.Repository
                 using (BinaryReader brHeader = new BinaryReader(HeaderStream),
                                     brData = new BinaryReader(DataStream))
                 {
-                    if(brHeader.BaseStream.Length > 0)
+                    if (brHeader.BaseStream.Length > 0)
                     {
                         brHeader.BaseStream.Seek(0, SeekOrigin.Begin);
                         n = brHeader.ReadInt32();
@@ -231,7 +268,7 @@ namespace Infraestructure.Repository
                     brHeader.BaseStream.Seek(posh, SeekOrigin.Begin);
                     int index = brHeader.ReadInt32();
                     //TODO VALIDATE INDEX
-                    if(index != id)
+                    if (index != id)
                     {
                         return default;
                     }
@@ -278,7 +315,7 @@ namespace Infraestructure.Repository
                         {
                             pinfo.SetValue(newValue, brData.GetValue<string>(TypeCode.String));
                         }
-                    }                   
+                    }
                 }
                 return newValue;
             }
@@ -341,16 +378,16 @@ namespace Infraestructure.Repository
             {
                 using (BinaryReader brHeader = new BinaryReader(HeaderStream))
                 {
-                    if(brHeader.BaseStream.Length > 0)
+                    if (brHeader.BaseStream.Length > 0)
                     {
                         brHeader.BaseStream.Seek(0, SeekOrigin.Begin);
                         n = brHeader.ReadInt32();
                         k = brHeader.ReadInt32();
                     }
-                    
+
                 }
 
-                if(n == 0)
+                if (n == 0)
                 {
                     return listT;
                 }
@@ -378,7 +415,7 @@ namespace Infraestructure.Repository
             {
                 throw;
             }
-           
+
         }
     }
 }
