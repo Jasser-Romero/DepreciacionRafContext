@@ -10,12 +10,14 @@ namespace practicaDepreciacion
     public partial class Form1 : Form
     {
         IActivoServices activoServices;
-        List<Activo> activos;
-        List<int> activoIds;
+
+        //List<Activo> activos;
+        //List<int> activoIds;
         public Form1(IActivoServices ActivoServices)
         {
             this.activoServices = ActivoServices;
-            activos = activoServices.Read();
+
+            //activos = activoServices.Read();
             
             InitializeComponent();
         }
@@ -141,12 +143,15 @@ namespace practicaDepreciacion
                 MessageBox.Show("Debe seleccionar un activo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            activoIds = activos.Select(x => x.Id).ToList();
+            //activoIds = activos.Select(x => x.Id).ToList();
 
-            activoServices.Delete((int)dataGridView1.CurrentRow.Cells[0].Value, activoIds);
+            activoServices.Delete((int)dataGridView1.CurrentRow.Cells[0].Value);
 
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = activoServices.Read();
+            MessageBox.Show("Se ha eliminado correctamente el objeto");
+
+
             //activoServices.Delete(dataGridView1.CurrentRow.Index);
             //dataGridView1.DataSource = null;
             //dataGridView1.DataSource = activoServices.Read();

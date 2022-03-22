@@ -28,11 +28,12 @@ namespace Infraestructure.Repository
             }
         }
 
-        public void Delete(int id, List<int> activos)
+        public void Delete(int id)
         {
             try
             {
-                context.Delete<Activo>(id, activos);
+                context.Delete<Activo>(id);
+                //context.Delete<Activo>(id, activos);
             }
             catch (Exception)
             {

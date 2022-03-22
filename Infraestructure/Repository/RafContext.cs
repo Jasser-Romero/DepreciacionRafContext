@@ -1,5 +1,4 @@
-﻿using Domain.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
@@ -202,49 +201,56 @@ namespace Infraestructure.Repository
             }
         }
 
-        public void Delete<T>(int id, List<int> listaIds)
+        public void Delete<T>(int id)
         {
-           //TODO: Falta agregar busqueda del id y agregar funciones para eliminar el objeto
+
             try
             {
-                int n = 0, k = 0;
-                listaIds.Remove(id);
-                if (id < 0)
+                long pos = 8 + (1 - id) * 4;
+                using (BinaryWriter brHeader = new BinaryWriter(HeaderStream))
                 {
-                    throw new Exception("No exiten objetos activos");
-                }
-
-                using (BinaryReader brHeader = new BinaryReader(HeaderStream))
-                {
-                    if (brHeader.BaseStream.Length > 0)
-                    {
-                        brHeader.BaseStream.Seek(0, SeekOrigin.Begin);
-                        n = brHeader.ReadInt32();
-                        k = brHeader.ReadInt32();
-                    }
+                    brHeader.BaseStream.Seek(pos, SeekOrigin.Begin);
+                    brHeader.Write(0);
 
                 }
+                //int n = 0, k = 0;
+                //listaIds.Remove(id);
+                //if (id < 0)
+                //{
+                //    throw new Exception("No exiten objetos activos");
+                //}
 
-                using (BinaryWriter bwHeader = new BinaryWriter(HeaderStream))
-                {
-                    long posh = 8;
-                    bwHeader.BaseStream.Seek(posh, SeekOrigin.Begin);
-                    for (int i = 0; i < listaIds.Count; i++)
-                    {
-                        bwHeader.Write(listaIds[i]);
-                    }
+                //using (BinaryReader brHeader = new BinaryReader(HeaderStream))
+                //{
+                //    if (brHeader.BaseStream.Length > 0)
+                //    {
+                //        brHeader.BaseStream.Seek(0, SeekOrigin.Begin);
+                //        n = brHeader.ReadInt32();
+                //        k = brHeader.ReadInt32();
+                //    }
 
-                    bwHeader.BaseStream.Seek(0, SeekOrigin.Begin);
-                    bwHeader.Write(--n);
-                    bwHeader.Write(k);
+                //}
 
-                }
+                //using (BinaryWriter bwHeader = new BinaryWriter(HeaderStream))
+                //{
+                //    long posh = 8;
+                //    bwHeader.BaseStream.Seek(posh, SeekOrigin.Begin);
+                //    for (int i = 0; i < listaIds.Count; i++)
+                //    {
+                //        bwHeader.Write(listaIds[i]);
+                //    }
+
+                //    bwHeader.BaseStream.Seek(0, SeekOrigin.Begin);
+                //    bwHeader.Write(--n);
+                //    bwHeader.Write(k);
+
+                //}
                 //using (BinaryWriter bwTemporay = new BinaryWriter(TemporaryStream))
                 //{
 
                 //}
 
-                
+
             }
             catch (Exception)
             {
@@ -359,9 +365,11 @@ namespace Infraestructure.Repository
                     return listT;
                 }
 
+
                 for (int i = 0; i < n; i++)
                 {
                     int index;
+                   
                     using (BinaryReader brHeader = new BinaryReader(HeaderStream))
                     {
                         long posh = 8 + i * 4;
@@ -375,6 +383,7 @@ namespace Infraestructure.Repository
 
                 return listT;
             }
+
             catch (Exception)
             {
                 throw;

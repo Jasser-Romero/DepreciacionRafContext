@@ -51,7 +51,7 @@ namespace Infraestructure.Repository
             }
         }
 
-        public void Delete(int id, List<int> ids)
+        public void Delete(int id)
         {
             throw new NotImplementedException();
         }
@@ -135,12 +135,12 @@ namespace Infraestructure.Repository
 
         }
 
-        public void Update(Activo t)
+        public void Update(Activo t,int id)
         {
             throw new NotImplementedException();
         }
 
-        public void Update(Activo t, int id)
+        public void Update(int id)
         {
             throw new NotImplementedException();
         }
