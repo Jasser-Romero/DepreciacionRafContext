@@ -10,7 +10,6 @@ namespace Infraestructure.Repository
     {
         private string fileName;
         private int size;
-        private string temporalFile = "temporalFile";
         public RAFContext(string fileName, int size)
         {
             this.fileName = fileName;
@@ -25,11 +24,6 @@ namespace Infraestructure.Repository
         public Stream DataStream
         {
             get => File.Open($"{fileName}.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
-        }
-
-        public Stream TemporaryStream
-        {
-            get => File.Open($"{temporalFile}.tp", FileMode.OpenOrCreate, FileAccess.ReadWrite);
         }
 
         public void Create<T>(T t)
@@ -203,15 +197,13 @@ namespace Infraestructure.Repository
 
         public void Delete<T>(int id)
         {
-
             try
             {
-                long pos = 8 + (1 - id) * 4;
+                long pos = 8 + (id - 1) * 4;
                 using (BinaryWriter brHeader = new BinaryWriter(HeaderStream))
                 {
                     brHeader.BaseStream.Seek(pos, SeekOrigin.Begin);
                     brHeader.Write(0);
-
                 }
                 //int n = 0, k = 0;
                 //listaIds.Remove(id);
@@ -245,11 +237,7 @@ namespace Infraestructure.Repository
                 //    bwHeader.Write(k);
 
                 //}
-                //using (BinaryWriter bwTemporay = new BinaryWriter(TemporaryStream))
-                //{
-
-                //}
-
+              
 
             }
             catch (Exception)

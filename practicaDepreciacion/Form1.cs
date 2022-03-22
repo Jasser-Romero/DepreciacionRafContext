@@ -122,15 +122,21 @@ namespace practicaDepreciacion
 
         private void btnActualizar_Click(object sender, EventArgs e)
         {
+            if(dataGridView1.CurrentRow.Selected == false)
+            {
+                MessageBox.Show("Debe seleccionar un activo", "Error", MessageBoxButtons.OK,MessageBoxIcon.Error);
+                return;
+            }
             FrmActualizar frmActualizar = new FrmActualizar();
             frmActualizar.activoServices = activoServices;
             frmActualizar.lblId.Text = dataGridView1.CurrentRow.Cells[0].Value.ToString();
             frmActualizar.txtNombre.Text = dataGridView1.CurrentRow.Cells[1].Value.ToString();
             frmActualizar.nudValor.Value = decimal.Parse(dataGridView1.CurrentRow.Cells[2].Value.ToString());
-            frmActualizar.nudValorResidual.Value = decimal.Parse(dataGridView1.CurrentRow.Cells[3].Value.ToString());
-            frmActualizar.nudVidaUtil.Value = decimal.Parse(dataGridView1.CurrentRow.Cells[4].Value.ToString());
+            frmActualizar.nudValorResidual.Value = decimal.Parse(dataGridView1.CurrentRow.Cells[4].Value.ToString());
+            frmActualizar.nudVidaUtil.Value = decimal.Parse(dataGridView1.CurrentRow.Cells[3].Value.ToString());
 
             frmActualizar.ShowDialog();
+
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = activoServices.Read();
         }
@@ -149,12 +155,6 @@ namespace practicaDepreciacion
 
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = activoServices.Read();
-            MessageBox.Show("Se ha eliminado correctamente el objeto");
-
-
-            //activoServices.Delete(dataGridView1.CurrentRow.Index);
-            //dataGridView1.DataSource = null;
-            //dataGridView1.DataSource = activoServices.Read();
         }
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
