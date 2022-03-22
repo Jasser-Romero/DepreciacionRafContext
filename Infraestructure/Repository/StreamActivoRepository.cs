@@ -51,7 +51,7 @@ namespace Infraestructure.Repository
             }
         }
 
-        public void Delete(int id)
+        public void Delete(int id, List<int> ids)
         {
             throw new NotImplementedException();
         }

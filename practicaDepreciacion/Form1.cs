@@ -1,16 +1,22 @@
 ﻿using AppCore.IServices;
 using Domain.Entities;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace practicaDepreciacion
 {
     public partial class Form1 : Form
     {
         IActivoServices activoServices;
+        List<Activo> activos;
+        List<int> activoIds;
         public Form1(IActivoServices ActivoServices)
         {
             this.activoServices = ActivoServices;
+            activos = activoServices.Read();
+            
             InitializeComponent();
         }
 
@@ -135,7 +141,12 @@ namespace practicaDepreciacion
                 MessageBox.Show("Debe seleccionar un activo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+            activoIds = activos.Select(x => x.Id).ToList();
 
+            activoServices.Delete((int)dataGridView1.CurrentRow.Cells[0].Value, activoIds);
+
+            dataGridView1.DataSource = null;
+            dataGridView1.DataSource = activoServices.Read();
             //activoServices.Delete(dataGridView1.CurrentRow.Index);
             //dataGridView1.DataSource = null;
             //dataGridView1.DataSource = activoServices.Read();
@@ -143,7 +154,7 @@ namespace practicaDepreciacion
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            int ID=(int)dataGridView1.Rows[e.RowIndex].Cells[0].Value;
+            
         }
     }
 }

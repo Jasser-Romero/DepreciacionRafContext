@@ -24,7 +24,7 @@ namespace Infraestructure.Repository
             data.Remove(t);
         }
 
-        public void Delete(int id)
+        public void Delete(int id, List<int> listaIds)
         {
             throw new NotImplementedException();
         }

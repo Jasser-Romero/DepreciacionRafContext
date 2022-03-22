@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
@@ -10,7 +11,7 @@ namespace Infraestructure.Repository
     {
         private string fileName;
         private int size;
-
+        private string temporalFile = "temporalFile";
         public RAFContext(string fileName, int size)
         {
             this.fileName = fileName;
@@ -29,7 +30,7 @@ namespace Infraestructure.Repository
 
         public Stream TemporaryStream
         {
-            get => File.Open($"{fileName}.tmp", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            get => File.Open($"{temporalFile}.tp", FileMode.OpenOrCreate, FileAccess.ReadWrite);
         }
 
         public void Create<T>(T t)
@@ -201,15 +202,13 @@ namespace Infraestructure.Repository
             }
         }
 
-        public void Delete<T>(int id)
+        public void Delete<T>(int id, List<int> listaIds)
         {
-
            //TODO: Falta agregar busqueda del id y agregar funciones para eliminar el objeto
-
             try
             {
                 int n = 0, k = 0;
-
+                listaIds.Remove(id);
                 if (id < 0)
                 {
                     throw new Exception("No exiten objetos activos");
@@ -221,18 +220,31 @@ namespace Infraestructure.Repository
                     {
                         brHeader.BaseStream.Seek(0, SeekOrigin.Begin);
                         n = brHeader.ReadInt32();
+                        k = brHeader.ReadInt32();
                     }
 
-                    k = brHeader.ReadInt32();
-                    //verificando si el que se elimina esta en la ultima posicion
-                    k = (k == id) ? k - 1 : k;
-
-                    using (BinaryWriter brtemporay = new BinaryWriter(TemporaryStream))
-                    {
-                        brtemporay.Write(--n);
-                        brtemporay.Write(k);
-                    }
                 }
+
+                using (BinaryWriter bwHeader = new BinaryWriter(HeaderStream))
+                {
+                    long posh = 8;
+                    bwHeader.BaseStream.Seek(posh, SeekOrigin.Begin);
+                    for (int i = 0; i < listaIds.Count; i++)
+                    {
+                        bwHeader.Write(listaIds[i]);
+                    }
+
+                    bwHeader.BaseStream.Seek(0, SeekOrigin.Begin);
+                    bwHeader.Write(--n);
+                    bwHeader.Write(k);
+
+                }
+                //using (BinaryWriter bwTemporay = new BinaryWriter(TemporaryStream))
+                //{
+
+                //}
+
+                
             }
             catch (Exception)
             {
