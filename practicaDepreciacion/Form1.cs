@@ -11,14 +11,14 @@ namespace practicaDepreciacion
     {
         IActivoServices activoServices;
 
-        //List<Activo> activos;
-        //List<int> activoIds;
+        List<Activo> activos;
+        List<int> activoIds;
         public Form1(IActivoServices ActivoServices)
         {
             this.activoServices = ActivoServices;
 
-            //activos = activoServices.Read();
             
+
             InitializeComponent();
         }
 
@@ -149,9 +149,11 @@ namespace practicaDepreciacion
                 MessageBox.Show("Debe seleccionar un activo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            //activoIds = activos.Select(x => x.Id).ToList();
+            activos = activoServices.Read();
 
-            activoServices.Delete((int)dataGridView1.CurrentRow.Cells[0].Value);
+            activoIds = activos.Select(x => x.Id).ToList();
+
+            activoServices.Delete((int)dataGridView1.CurrentRow.Cells[0].Value, activoIds);
 
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = activoServices.Read();

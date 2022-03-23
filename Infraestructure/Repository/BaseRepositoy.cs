@@ -29,6 +29,11 @@ namespace Infraestructure.Repository
             throw new NotImplementedException();
         }
 
+        public void Delete(int id, List<int> listaIds)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<T> Read()
         {
             return data;

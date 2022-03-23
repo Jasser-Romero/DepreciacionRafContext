@@ -28,12 +28,11 @@ namespace Infraestructure.Repository
             }
         }
 
-        public void Delete(int id)
+        public void Delete(int id, List<int> listaIds)
         {
             try
             {
-                context.Delete<Activo>(id);
-                //context.Delete<Activo>(id, activos);
+                context.Delete<Activo>(id, listaIds);
             }
             catch (Exception)
             {
@@ -75,6 +74,11 @@ namespace Infraestructure.Repository
             {
                 throw;
             }
+        }
+
+        public void Delete(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

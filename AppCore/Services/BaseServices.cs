@@ -26,6 +26,11 @@ namespace AppCore.Services
             Model.Delete(id);
         }
 
+        public void Delete(int id, List<int> listaIds)
+        {
+            Model.Delete(id, listaIds);
+        }
+
         public List<T> Read()
         {
             return Model.Read();

@@ -10,6 +10,7 @@ namespace Infraestructure.Repository
     {
         private string fileName;
         private int size;
+        private string temporalActivo = "temporalActivo";
         public RAFContext(string fileName, int size)
         {
             this.fileName = fileName;
@@ -26,6 +27,10 @@ namespace Infraestructure.Repository
             get => File.Open($"{fileName}.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
         }
 
+        public Stream TemporalHeader
+        {
+            get => File.Open($"{temporalActivo}.tp", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+        }
         public void Create<T>(T t)
         {
             try
@@ -121,71 +126,59 @@ namespace Infraestructure.Repository
                 using (BinaryWriter bwHeader = new BinaryWriter(HeaderStream),
                                  bwData = new BinaryWriter(DataStream))
                 {
-                    int n = 0, k = 0;
-                    using (BinaryReader brHeader = new BinaryReader(bwHeader.BaseStream))
+                    //calculamos la posicion en Data
+                    long pos = (id - 1) * size;
+                    bwData.BaseStream.Seek(pos, SeekOrigin.Begin);
+
+                    PropertyInfo[] info = t.GetType().GetProperties();
+                    foreach (PropertyInfo pinfo in info)
                     {
-                        if (brHeader.BaseStream.Length > 0)
+                        Type type = pinfo.PropertyType;
+                        object obj = pinfo.GetValue(t, null);
+
+                        if (type.IsGenericType)
                         {
-                            brHeader.BaseStream.Seek(0, SeekOrigin.Begin);
-                            n = brHeader.ReadInt32();
-                            k = brHeader.ReadInt32();
+                            continue;
                         }
 
-                        //calculamos la posicion en Data
-                        long pos = (id - 1) * size;
-                        bwData.BaseStream.Seek(pos, SeekOrigin.Begin);
+                        //if (pinfo.Name.Equals("Id", StringComparison.CurrentCultureIgnoreCase))
+                        //{
+                        //    bwData.Write(++k);
+                        //    continue;
+                        //}
 
-                        PropertyInfo[] info = t.GetType().GetProperties();
-                        foreach (PropertyInfo pinfo in info)
+                        if (type == typeof(int))
                         {
-                            Type type = pinfo.PropertyType;
-                            object obj = pinfo.GetValue(t, null);
-
-                            if (type.IsGenericType)
-                            {
-                                continue;
-                            }
-
-                            //if (pinfo.Name.Equals("Id", StringComparison.CurrentCultureIgnoreCase))
-                            //{
-                            //    bwData.Write(++k);
-                            //    continue;
-                            //}
-
-                            if (type == typeof(int))
-                            {
-                                bwData.Write((int)obj);
-                            }
-                            else if (type == typeof(long))
-                            {
-                                bwData.Write((long)obj);
-                            }
-                            else if (type == typeof(float))
-                            {
-                                bwData.Write((float)obj);
-                            }
-                            else if (type == typeof(double))
-                            {
-                                bwData.Write((double)obj);
-                            }
-                            else if (type == typeof(decimal))
-                            {
-                                bwData.Write((decimal)obj);
-                            }
-                            else if (type == typeof(char))
-                            {
-                                bwData.Write((char)obj);
-                            }
-                            else if (type == typeof(bool))
-                            {
-                                bwData.Write((bool)obj);
-                            }
-                            else if (type == typeof(string))
-                            {
-                                bwData.Write((string)obj);
-                            }
+                            bwData.Write((int)obj);
                         }
-
+                        else if (type == typeof(long))
+                        {
+                            bwData.Write((long)obj);
+                        }
+                        else if (type == typeof(float))
+                        {
+                            bwData.Write((float)obj);
+                        }
+                        else if (type == typeof(double))
+                        {
+                            bwData.Write((double)obj);
+                        }
+                        else if (type == typeof(decimal))
+                        {
+                            bwData.Write((decimal)obj);
+                        }
+                        else if (type == typeof(char))
+                        {
+                            bwData.Write((char)obj);
+                        }
+                        else if (type == typeof(bool))
+                        {
+                            bwData.Write((bool)obj);
+                        }
+                        else if (type == typeof(string))
+                        {
+                            bwData.Write((string)obj);
+                        }
                     }
                 }
             }
@@ -195,50 +188,37 @@ namespace Infraestructure.Repository
             }
         }
 
-        public void Delete<T>(int id)
+        public void Delete<T>(int id, List<int> listaIds)
         {
             try
             {
-                long pos = 8 + (id - 1) * 4;
-                using (BinaryWriter brHeader = new BinaryWriter(HeaderStream))
+                int n = 0, k = 0;
+                using (BinaryReader brHeader = new BinaryReader(HeaderStream))
                 {
-                    brHeader.BaseStream.Seek(pos, SeekOrigin.Begin);
-                    brHeader.Write(0);
+                    brHeader.BaseStream.Seek(0, SeekOrigin.Begin);
+                    n = brHeader.ReadInt32();
+                    k = brHeader.ReadInt32();
+
+                    int index = listaIds.BinarySearch(id);
+
+                    using(BinaryWriter bwTemporal = new BinaryWriter(TemporalHeader))
+                    {
+                        bwTemporal.BaseStream.Seek(0, SeekOrigin.Begin);
+                        bwTemporal.Write(--n);
+                        bwTemporal.Write(k);
+
+                        for(int i = 0; i < listaIds.Count; i++)
+                        {
+                            if (listaIds[i] != id)
+                            {
+                                bwTemporal.Write(listaIds[i]);
+                            }
+                        }
+
+                    }
                 }
-                //int n = 0, k = 0;
-                //listaIds.Remove(id);
-                //if (id < 0)
-                //{
-                //    throw new Exception("No exiten objetos activos");
-                //}
-
-                //using (BinaryReader brHeader = new BinaryReader(HeaderStream))
-                //{
-                //    if (brHeader.BaseStream.Length > 0)
-                //    {
-                //        brHeader.BaseStream.Seek(0, SeekOrigin.Begin);
-                //        n = brHeader.ReadInt32();
-                //        k = brHeader.ReadInt32();
-                //    }
-
-                //}
-
-                //using (BinaryWriter bwHeader = new BinaryWriter(HeaderStream))
-                //{
-                //    long posh = 8;
-                //    bwHeader.BaseStream.Seek(posh, SeekOrigin.Begin);
-                //    for (int i = 0; i < listaIds.Count; i++)
-                //    {
-                //        bwHeader.Write(listaIds[i]);
-                //    }
-
-                //    bwHeader.BaseStream.Seek(0, SeekOrigin.Begin);
-                //    bwHeader.Write(--n);
-                //    bwHeader.Write(k);
-
-                //}
-              
-
+                File.Delete($"{fileName}.hd");
+                File.Copy($"{temporalActivo}.tp", $"{fileName}.hd");
             }
             catch (Exception)
             {
@@ -247,6 +227,7 @@ namespace Infraestructure.Repository
 
 
         }
+
         public T Get<T>(int id)
         {
             try
@@ -263,21 +244,33 @@ namespace Infraestructure.Repository
                         k = brHeader.ReadInt32();
                     }
 
+                    List<int> listaIds = new List<int>();
+                    brHeader.BaseStream.Seek(8, SeekOrigin.Begin);
+
+                    while (brHeader.BaseStream.Position < brHeader.BaseStream.Length)
+                    {
+                        listaIds.Add(brHeader.ReadInt32());
+                    }
+
+                    int indexId = listaIds.BinarySearch(id);
+
                     if (id <= 0 || id > k)
                     {
                         return default(T);
                     }
 
                     PropertyInfo[] properties = newValue.GetType().GetProperties();
-                    long posh = 8 + (id - 1) * 4;
+                    long posh = 8 + indexId * 4;
+
                     //TODO Add Binary search to find the id
+                    if (listaIds.BinarySearch(id) < 0)
+                    {
+                        return default(T);
+                    }
+
                     brHeader.BaseStream.Seek(posh, SeekOrigin.Begin);
                     int index = brHeader.ReadInt32();
                     //TODO VALIDATE INDEX
-                    if (index != id)
-                    {
-                        return default;
-                    }
                     long posd = (index - 1) * size;
                     brData.BaseStream.Seek(posd, SeekOrigin.Begin);
                     foreach (PropertyInfo pinfo in properties)
